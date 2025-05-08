@@ -61,6 +61,7 @@
     }
 
     .message {
+      position: relative;
       max-width: 640px;
       padding: 1rem 1.25rem;
       border-radius: 0.75rem;
@@ -80,6 +81,36 @@
       align-self: flex-end;
       background-color: #2563eb;
       color: #ffffff;
+    }
+
+    .message:hover .actions {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .actions {
+      position: absolute;
+      top: 0.3rem;
+      right: 0.5rem;
+      display: flex;
+      gap: 0.4rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .actions button {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.2rem;
+      transition: color 0.2s;
+    }
+
+    .actions button:hover {
+      color: #e2e8f0;
     }
 
     #input-area {
@@ -118,11 +149,6 @@
     }
 
     #input-area button:hover {
-      background-color: #1e293b;
-      border-color: #64748b;
-    }
-
-    #input-area button:hover {
       background-color: #60a5fa;
     }
 
@@ -132,7 +158,6 @@
       opacity: 0.6;
     }
 
-    /* Estilos para o fundo de estrelas */
     canvas {
       position: absolute;
       top: 0;
@@ -170,7 +195,6 @@
   </div>
 
   <script>
-    // Função para gerar o efeito de fundo de estrelas
     const canvas = document.getElementById('starsCanvas');
     const ctx = canvas.getContext('2d');
     const numStars = 300;
@@ -196,49 +220,98 @@
 
       for (let i = 0; i < stars.length; i++) {
         const star = stars[i];
-
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
         ctx.fill();
-
         star.y += star.speed;
         if (star.y > canvas.height) {
           star.y = 0;
         }
       }
-
       requestAnimationFrame(updateStars);
     }
 
     generateStars();
     updateStars();
 
-    // Função para manipular o chat
     (function(){
       const chatMessages = document.getElementById('chat-messages');
       const inputForm = document.getElementById('input-area');
       const userInput = document.getElementById('user-input');
       let isProcessing = false;
+      let currentSpeech = null;
 
-      function appendMessage(text, sender) {
+      function createMessageElement(text, sender) {
         const msg = document.createElement('div');
         msg.className = `message ${sender}`;
-        msg.textContent = text;
+        const textNode = document.createTextNode(text);
+        msg.appendChild(textNode);
+
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+
+        const speakBtn = document.createElement('button');
+        speakBtn.innerHTML = '🔊';
+        speakBtn.title = 'Ouvir';
+        speakBtn.onclick = () => {
+          if (currentSpeech) {
+            speechSynthesis.cancel();  // Cancela qualquer fala anterior
+          }
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = 'pt-BR';
+          currentSpeech = utterance;
+          speechSynthesis.speak(utterance);
+        };
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.innerHTML = '❌';
+        cancelBtn.title = 'Cancelar fala';
+        cancelBtn.onclick = () => {
+          if (currentSpeech) {
+            speechSynthesis.cancel();
+            currentSpeech = null;
+          }
+        };
+
+        const copyBtn = document.createElement('button');
+        copyBtn.innerHTML = '📋';
+        copyBtn.title = 'Copiar';
+        copyBtn.onclick = () => {
+          navigator.clipboard.writeText(text).then(() => {
+            copyBtn.innerText = '✅';
+            setTimeout(() => copyBtn.innerText = '📋', 1000);
+          });
+        };
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '🗑️';
+        deleteBtn.title = 'Excluir';
+        deleteBtn.onclick = () => {
+          msg.remove();
+        };
+
+        actions.append(speakBtn, cancelBtn, copyBtn, deleteBtn);
+        msg.appendChild(actions);
+        return msg;
+      }
+
+      function appendMessage(text, sender) {
+        const msg = createMessageElement(text, sender);
         chatMessages.appendChild(msg);
         chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
       }
 
       function simulateTypingEffect(text, sender = 'ai') {
-        const el = document.createElement('div');
-        el.className = `message ${sender}`;
-        chatMessages.appendChild(el);
+        const msg = createMessageElement('', sender);
+        const textNode = msg.childNodes[0];
+        chatMessages.appendChild(msg);
         chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
 
         let i = 0;
         function type() {
           if (i < text.length) {
-            el.textContent += text.charAt(i++);
+            textNode.textContent += text.charAt(i++);
             setTimeout(type, 20);
           } else {
             isProcessing = false;
