@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>NeuraBot Login</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto&display=swap');
+
+  /* Reset and base */
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    overflow: hidden;
+    background: #000012;
+    font-family: 'Roboto', sans-serif;
+    color: #eee;
+  }
+
+  #starfield {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(ellipse at center, #050525 0%, #000012 100%);
+  }
+
+  #app-container {
+    position: relative;
+    width: 350px;
+    max-width: 95vw;
+    height: 600px;
+    margin: 20px auto;
+    perspective: 1200px;
+    z-index: 10;
+  }
+
+  .flip-card {
+    width: 100%;
+    height: 100%;
+    background: rgba(10,10,30,0.7);
+    border-radius: 15px;
+    box-shadow:
+      0 0 40px #1a1a4d, 
+      inset 0 0 15px #668cff90;
+    color: #eee;
+    transition: transform 0.8s cubic-bezier(0.4,0,0.2,1);
+    transform-style: preserve-3d;
+    position: relative;
+  }
+  .flip-card.flipped {
+    transform: rotateY(180deg);
+  }
+
+  .side {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    padding: 2rem 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .front {
+    border-radius: 15px;
+    background-color: rgba(10,10,30,0.7);
+  }
+  .back {
+    transform: rotateY(180deg);
+    border-radius: 15px;
+    background-color: rgba(10,10,30,0.8);
+    overflow-y: auto;
+  }
+
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+    color: #92c1ff;
+    text-shadow: 0 0 15px #92c1ff88;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  input[type="email"],
+  input[type="password"],
+  input[type="text"] {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    background: #1a1a3a;
+    color: #cce0ff;
+    box-shadow: inset 0 0 5px #5691f5;
+    transition: 0.3s ease background-color;
+  }
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="text"]:focus {
+    background-color: #2e3a62;
+  }
+
+  button {
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, #357ced, #5691f5);
+    color: white;
+    box-shadow: 0 0 15px #357cedaa;
+    transition: background 0.4s ease;
+  }
+  button:hover {
+    background: linear-gradient(135deg, #5691f5, #357ced);
+  }
+
+  /* Toggle buttons for flipping */
+  .toggle-btn {
+    margin-top: 1rem;
+    background: none;
+    color: #7faaff;
+    cursor: pointer;
+    font-size: 0.9rem;
+    border: none;
+    user-select: none;
+    text-align: center;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    text-decoration: underline;
+  }
+  .toggle-btn:hover, .toggle-btn:focus {
+    outline: none;
+    color: #a3bbff;
+  }
+
+  /* Social login buttons */
+  .social-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1rem 0 0;
+  }
+  .social-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    box-shadow: 0 0 8px #5c8bf5aa;
+    color: #fff;
+  }
+  .social-btn svg {
+    width: 20px;
+    height: 20px;
+    filter: drop-shadow(0 0 1px rgba(0,0,0,0.2));
+  }
+  .google-btn {
+    background: #4285F4;
+  }
+  .google-btn:hover {
+    background: #357ae8;
+  }
+  .github-btn {
+    background: #333;
+  }
+  .github-btn:hover {
+    background: #555;
+  }
+
+  /* Responsive & mobile adjustments */
+  @media (max-width: 400px){
+    #app-container {
+      width: 95vw;
+      height: 580px;
+      margin: 10px auto;
+      padding: 10px;
+    }
+    h1 {
+      font-size: 2.2rem;
+    }
+    .flip-card {
+      padding: 1rem;
+    }
+  }
+
+  /* Screen reader only */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
+  }
+</style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+
+<div id="app-container" aria-label="NeuraBot login and registration panel">
+  <div id="flip-card" class="flip-card" aria-live="polite">
+    <div class="side front" aria-label="Login form">
+      <h1>NeuraBot</h1>
+
+      <form id="login-form" aria-describedby="login-desc">
+        <div id="login-desc" class="sr-only">Login form, enter email and password</div>
+        <input type="email" id="login-email" placeholder="Email" required autocomplete="email" inputmode="email" />
+        <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password" />
+        <button type="submit" aria-label="Login">Login</button>
+      </form>
+
+      <div class="social-buttons" aria-label="Alternative login options">
+        <button class="social-btn google-btn" aria-label="Login with Google" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 533.5 544.3" aria-hidden="true" focusable="false">
+            <path fill="#4285F4" d="M533.5 278.4c0-17.4-1.6-34.1-4.7-50.4H272v95.5h146.9c-6.3 33.9-25.3 62.7-54.1 82v67h87.4c51.1-47.1 80.3-116.7 80.3-193.1z"/>
+            <path fill="#34A853" d="M272 544.3c73.6 0 135.5-24.4 180.7-66.2l-87.4-67c-24 16.1-55 25.7-93.3 25.7-71.7 0-132.6-48.3-154.4-113.4h-89.3v70.9C56.7 478.3 157.4 544.3 272 544.3z"/>
+            <path fill="#FBBC05" d="M117.6 321.1c-5.3-15.6-8.3-32.2-8.3-49.1s3-33.5 8.3-49.1v-70.8h-89.3c-18.4 36.7-18.4 80.8 0 117.5l89.3 70.9z"/>
+            <path fill="#EA4335" d="M272 213.2c39 0 74.1 13.4 101.7 39.7l76.3-76.3C393.9 129.3 337.4 106 272 106 157.4 106 56.7 172 18.3 278.4l89.3 70.8c21.8-65.1 82.7-113.3 164.4-113.3z"/>
+          </svg>
+          Google
+        </button>
+        <button class="social-btn github-btn" aria-label="Login with GitHub" type="button">
+          <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" fill="white">
+            <path d="M12 0a12 12 0 00-3.79 23.4c.6.11.82-.26.82-.58v-2.17c-3.34.73-4.04-1.6-4.04-1.6-.54-1.37-1.32-1.74-1.32-1.74-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.23 1.83 1.23 1.06 1.81 2.78 1.29 3.46.99.11-.77.41-1.29.75-1.59-2.67-.31-5.47-1.34-5.47-5.96 0-1.32.47-2.4 1.23-3.24-.12-.31-.54-1.56.12-3.25 0 0 1-.32 3.3 1.22a11.5 11.5 0 016 0c2.3-1.54 3.3-1.22 3.3-1.22.66 1.69.24 2.94.12 3.25.76.84 1.23 1.92 1.23 3.24 0 4.62-2.8 5.65-5.48 5.95.42.36.79 1.09.79 2.2v3.26c0 .32.22.7.82.58A12 12 0 0012 0z"/>
+          </svg>
+          GitHub
+        </button>
+      </div>
+
+      <button id="toggle-link" class="toggle-btn" aria-label="Switch to signup form" type="button">Don't have an account? Sign up</button>
+    </div>
+
+    <div class="side back" aria-label="Registration form">
+      <h1>NeuraBot</h1>
+
+      <form id="signup-form" aria-describedby="signup-desc">
+        <div id="signup-desc" class="sr-only">Signup form, enter name, email and password</div>
+        <input type="text" id="signup-name" placeholder="Full Name" required autocomplete="name" />
+        <input type="email" id="signup-email" placeholder="Email" required autocomplete="email" inputmode="email" />
+        <input type="password" id="signup-password" placeholder="Password" required autocomplete="new-password" />
+        <input type="password" id="signup-password-confirm" placeholder="Confirm Password" required autocomplete="new-password" />
+        <button type="submit" aria-label="Sign up">Sign Up</button>
+      </form>
+
+      <button id="toggle-link-back" class="toggle-btn" aria-label="Switch to login form" type="button">
+        Already have an account? Log in
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Flip card toggle
+  const flipCard = document.getElementById('flip-card');
+  const toggleLink = document.getElementById('toggle-link');
+  const toggleLinkBack = document.getElementById('toggle-link-back');
+
+  function toggleFlip() {
+    flipCard.classList.toggle('flipped');
+  }
+  toggleLink.addEventListener('click', toggleFlip);
+  toggleLinkBack.addEventListener('click', toggleFlip);
+
+  // Starfield background canvas (improved smooth parallax using lerp and original star positions)
+  const canvas = document.getElementById('starfield');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  let width, height;
+  const maxStars = 150;
+
+  function Star(x, y, radius, speed, opacity) {
+    this.x = x; // original x
+    this.y = y; // original y
+    this.radius = radius;
+    this.speed = speed;
+    this.opacity = opacity;
+    this.baseOpacity = opacity;
+    this.angle = Math.random() * 2 * Math.PI;
+    this.angularSpeed = (Math.random() * 0.02) + 0.005;
+    this.offsetX = 0;
+    this.offsetY = 0;
+  }
+  Star.prototype.draw = function(ctx, offsetX, offsetY) {
+    const drawX = this.x + offsetX;
+    const drawY = this.y + offsetY;
+
+    ctx.beginPath();
+    const glowRadius = this.radius * 2.5;
+    const gradient = ctx.createRadialGradient(drawX, drawY, this.radius, drawX, drawY, glowRadius);
+    gradient.addColorStop(0, `rgba(255,255,255,${this.opacity})`);
+    gradient.addColorStop(0.8, `rgba(150,180,255,${this.opacity*0.3})`);
+    gradient.addColorStop(1, 'rgba(150,180,255,0)');
+    ctx.fillStyle = gradient;
+    ctx.arc(drawX, drawY, glowRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.fillStyle = `rgba(255,255,255,${this.opacity})`;
+    ctx.shadowColor = `rgba(150,180,255,${this.opacity})`;
+    ctx.shadowBlur = 8;
+    ctx.arc(drawX, drawY, this.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  };
+  Star.prototype.update = function() {
+    this.angle += this.angularSpeed;
+    this.opacity = this.baseOpacity * (0.7 + 0.3 * Math.sin(this.angle * 3));
+  };
+
+
+  function createStars() {
+    stars = [];
+    for (let i = 0; i < maxStars; i++) {
+      let x = Math.random() * width;
+      let y = Math.random() * height;
+      let radius = Math.random() * 1.1 + 0.4;
+      let speed = (Math.random() * 0.05) + 0.01;
+      let opacity = 0.4 + Math.random() * 0.6;
+      stars.push(new Star(x, y, radius, speed, opacity));
+    }
+  }
+
+  function resize() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+    createStars();
+  }
+
+  window.addEventListener('resize', resize);
+
+  // Linear interpolation helper
+  function lerp(start, end, amt) {
+    return (1 - amt) * start + amt * end;
+  }
+
+  // Track the mouse position with smoothing
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let smoothedX = mouseX;
+  let smoothedY = mouseY;
+  window.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+
+  // Animate stars with parallax effect and twinkle
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+
+    // Smoothly update smoothed mouse positions towards actual mouse
+    smoothedX = lerp(smoothedX, mouseX, 0.05);
+    smoothedY = lerp(smoothedY, mouseY, 0.05);
+
+    // Calculate center offsets from screen center, maximum parallax amplitude 15px
+    let offsetX = (smoothedX - width / 2) * 0.03;
+    let offsetY = (smoothedY - height / 2) * 0.03;
+
+    for (let star of stars) {
+      star.update();
+      // Draw stars offset by parallax amount, no permanent movement on star coords
+      star.draw(ctx, offsetX * star.radius * 0.9, offsetY * star.radius * 0.9);
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  resize();
+  animate();
+
+  // Form submit handlers (for demo only)
+  document.getElementById('login-form').addEventListener('submit', e => {
+    e.preventDefault();
+    alert('Logged in with email: ' + e.target['login-email'].value);
+  });
+  document.getElementById('signup-form').addEventListener('submit', e => {
+    e.preventDefault();
+    let pass = e.target['signup-password'].value;
+    let passConfirm = e.target['signup-password-confirm'].value;
+    if (pass !== passConfirm) {
+      alert('Passwords do not match!');
+      return;
+    }
+    alert('Registered user: ' + e.target['signup-name'].value);
+  });
+
+  // Social Login buttons placeholders
+  document.querySelector('.google-btn').addEventListener('click', () => {
+    alert('Google login clicked!');
+  });
+  document.querySelector('.github-btn').addEventListener('click', () => {
+    alert('GitHub login clicked!');
+  });
+</script>
+
+</body>
+</html>
+</content>
+</create_file>
