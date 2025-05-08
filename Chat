@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chat NueraBot</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      color: #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    header {
+      padding: 1.2rem 2rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      border-bottom: 1px solid #1e293b;
+      background-color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    header .icon {
+      font-size: 1.8rem;
+    }
+
+    #chat-container {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem 2rem;
+      overflow: hidden;
+      position: relative;
+      z-index: 2;
+    }
+
+    #chat-messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      scroll-behavior: smooth;
+    }
+
+    .message {
+      max-width: 640px;
+      padding: 1rem 1.25rem;
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .message.ai {
+      align-self: flex-start;
+      background-color: #1e293b;
+      color: #dbeafe;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background-color: #2563eb;
+      color: #ffffff;
+    }
+
+    #input-area {
+      display: flex;
+      gap: 0.75rem;
+      padding: 1rem 2rem;
+      border-top: 1px solid #1e293b;
+      background-color: #0f172a;
+    }
+
+    #input-area input[type="text"] {
+      flex-grow: 1;
+      padding: 0.9rem 1.25rem;
+      font-size: 1rem;
+      border: 1px solid #334155;
+      border-radius: 9999px;
+      background-color: #1e293b;
+      color: #e2e8f0;
+      outline: none;
+    }
+
+    #input-area input::placeholder {
+      color: #94a3b8;
+    }
+
+    #input-area button {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border: 1px solid #475569;
+      border-radius: 9999px;
+      background-color: transparent;
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    #input-area button:hover {
+      background-color: #1e293b;
+      border-color: #64748b;
+    }
+
+    #input-area button:hover {
+      background-color: #60a5fa;
+    }
+
+    #input-area.disabled input,
+    #input-area.disabled button {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    /* Estilos para o fundo de estrelas */
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    @media (max-width: 600px) {
+      header, #chat-container, #input-area {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      header {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="starsCanvas"></canvas>
+
+  <header>
+    <span class="icon" aria-hidden="true">🪐</span>
+    NeuraBot
+  </header>
+  <div id="chat-container">
+    <section id="chat-messages" aria-live="polite" tabindex="0"></section>
+    <form id="input-area" aria-label="Enviar mensagem">
+      <input type="text" id="user-input" placeholder="Digite sua mensagem..." required />
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
+
+  <script>
+    // Função para gerar o efeito de fundo de estrelas
+    const canvas = document.getElementById('starsCanvas');
+    const ctx = canvas.getContext('2d');
+    const numStars = 300;
+    const stars = [];
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    function generateStars() {
+      for (let i = 0; i < numStars; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.5,
+          speed: Math.random() * 0.5 + 0.2,
+          opacity: Math.random() * 0.5 + 0.5,
+        });
+      }
+    }
+
+    function updateStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < stars.length; i++) {
+        const star = stars[i];
+
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+        ctx.fill();
+
+        star.y += star.speed;
+        if (star.y > canvas.height) {
+          star.y = 0;
+        }
+      }
+
+      requestAnimationFrame(updateStars);
+    }
+
+    generateStars();
+    updateStars();
+
+    // Função para manipular o chat
+    (function(){
+      const chatMessages = document.getElementById('chat-messages');
+      const inputForm = document.getElementById('input-area');
+      const userInput = document.getElementById('user-input');
+      let isProcessing = false;
+
+      function appendMessage(text, sender) {
+        const msg = document.createElement('div');
+        msg.className = `message ${sender}`;
+        msg.textContent = text;
+        chatMessages.appendChild(msg);
+        chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
+      }
+
+      function simulateTypingEffect(text, sender = 'ai') {
+        const el = document.createElement('div');
+        el.className = `message ${sender}`;
+        chatMessages.appendChild(el);
+        chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
+
+        let i = 0;
+        function type() {
+          if (i < text.length) {
+            el.textContent += text.charAt(i++);
+            setTimeout(type, 20);
+          } else {
+            isProcessing = false;
+            setInputDisabled(false);
+          }
+        }
+        type();
+      }
+
+      function setInputDisabled(disabled) {
+        inputForm.classList.toggle('disabled', disabled);
+        userInput.disabled = disabled;
+        inputForm.querySelector('button').disabled = disabled;
+      }
+
+      function simulateAIResponse(userText) {
+        const responses = [
+          "O cosmos é vasto e cheio de maravilhas ainda por descobrir.",
+          "Você sabia que a luz das estrelas pode levar milhares de anos para chegar até nós?",
+          "Vamos juntos navegar pela imensidão do espaço sideral!",
+          "Quer saber mais sobre planetas, buracos negros ou nebulosas?"
+        ];
+        const answer = userText.trim().length > 2
+          ? responses[Math.floor(Math.random() * responses.length)]
+          : "Desculpe, não entendi. Pode reformular?";
+        isProcessing = true;
+        setInputDisabled(true);
+        setTimeout(() => simulateTypingEffect(answer), 600 + Math.random() * 400);
+      }
+
+      inputForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (isProcessing) return;
+        const text = userInput.value.trim();
+        if (!text) return;
+        appendMessage(text, 'user');
+        userInput.value = '';
+        simulateAIResponse(text);
+      });
+
+      window.addEventListener('load', () => {
+        appendMessage("Olá! Sou a Neura, sua assistente IA. Vamos conversar sobre o universo?", 'ai');
+        setInputDisabled(false);
+        userInput.focus();
+      });
+    })();
+  </script>
+</body>
+</html>
