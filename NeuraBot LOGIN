@@ -1,439 +1,451 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-<title>NeuraBot Login</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto&display=swap');
-
-  /* Reset and base */
-  * {
-    box-sizing: border-box;
-  }
-  body, html {
-    margin: 0; padding: 0; height: 100%;
-    overflow: hidden;
-    background: #000012;
-    font-family: 'Roboto', sans-serif;
-    color: #eee;
-  }
-
-  #starfield {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 0;
-    background: radial-gradient(ellipse at center, #050525 0%, #000012 100%);
-  }
-
-  #app-container {
-    position: relative;
-    width: 350px;
-    max-width: 95vw;
-    height: 600px;
-    margin: 20px auto;
-    perspective: 1200px;
-    z-index: 10;
-  }
-
-  .flip-card {
-    width: 100%;
-    height: 100%;
-    background: rgba(10,10,30,0.7);
-    border-radius: 15px;
-    box-shadow:
-      0 0 40px #1a1a4d, 
-      inset 0 0 15px #668cff90;
-    color: #eee;
-    transition: transform 0.8s cubic-bezier(0.4,0,0.2,1);
-    transform-style: preserve-3d;
-    position: relative;
-  }
-  .flip-card.flipped {
-    transform: rotateY(180deg);
-  }
-
-  .side {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    padding: 2rem 3rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .front {
-    border-radius: 15px;
-    background-color: rgba(10,10,30,0.7);
-  }
-  .back {
-    transform: rotateY(180deg);
-    border-radius: 15px;
-    background-color: rgba(10,10,30,0.8);
-    overflow-y: auto;
-  }
-
-  h1 {
-    font-family: 'Orbitron', sans-serif;
-    text-align: center;
-    font-size: 2.8rem;
-    margin-bottom: 1rem;
-    color: #92c1ff;
-    text-shadow: 0 0 15px #92c1ff88;
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  input[type="email"],
-  input[type="password"],
-  input[type="text"] {
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    border: none;
-    outline: none;
-    font-size: 1rem;
-    background: #1a1a3a;
-    color: #cce0ff;
-    box-shadow: inset 0 0 5px #5691f5;
-    transition: 0.3s ease background-color;
-  }
-  input[type="email"]:focus,
-  input[type="password"]:focus,
-  input[type="text"]:focus {
-    background-color: #2e3a62;
-  }
-
-  button {
-    padding: 0.8rem 1rem;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 1rem;
-    border: none;
-    cursor: pointer;
-    background: linear-gradient(135deg, #357ced, #5691f5);
-    color: white;
-    box-shadow: 0 0 15px #357cedaa;
-    transition: background 0.4s ease;
-  }
-  button:hover {
-    background: linear-gradient(135deg, #5691f5, #357ced);
-  }
-
-  /* Toggle buttons for flipping */
-  .toggle-btn {
-    margin-top: 1rem;
-    background: none;
-    color: #7faaff;
-    cursor: pointer;
-    font-size: 0.9rem;
-    border: none;
-    user-select: none;
-    text-align: center;
-    padding: 0;
-    font-family: 'Roboto', sans-serif;
-    text-decoration: underline;
-  }
-  .toggle-btn:hover, .toggle-btn:focus {
-    outline: none;
-    color: #a3bbff;
-  }
-
-  /* Social login buttons */
-  .social-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin: 1rem 0 0;
-  }
-  .social-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    border: none;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    box-shadow: 0 0 8px #5c8bf5aa;
-    color: #fff;
-  }
-  .social-btn svg {
-    width: 20px;
-    height: 20px;
-    filter: drop-shadow(0 0 1px rgba(0,0,0,0.2));
-  }
-  .google-btn {
-    background: #4285F4;
-  }
-  .google-btn:hover {
-    background: #357ae8;
-  }
-  .github-btn {
-    background: #333;
-  }
-  .github-btn:hover {
-    background: #555;
-  }
-
-  /* Responsive & mobile adjustments */
-  @media (max-width: 400px){
-    #app-container {
-      width: 95vw;
-      height: 580px;
-      margin: 10px auto;
-      padding: 10px;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chat NueraBot</title>
+  <style>
+    :root {
+      color-scheme: dark;
     }
-    h1 {
-      font-size: 2.2rem;
+
+    * {
+      box-sizing: border-box;
     }
-    .flip-card {
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      color: #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    header {
+      padding: 1.2rem 2rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      border-bottom: 1px solid #1e293b;
+      background-color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+      z-index: 4;
+    }
+
+    header .icon {
+      font-size: 1.8rem;
+    }
+
+    #profile-pic {
+      margin-left: auto;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #334155;
+    }
+
+    #toggle-sidebar {
+      background: none;
+      border: none;
+      color: #cbd5e1;
+      font-size: 1.5rem;
+      cursor: pointer;
+      margin-right: 0.75rem;
+    }
+
+    #sidebar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100%;
+      background-color: rgba(15, 23, 42, 0.6);
+      color: #cbd5e1;
       padding: 1rem;
+      border-right: 1px solid #1e293b;
+      z-index: 3;
+      backdrop-filter: blur(6px);
+      transition: transform 0.3s ease;
+      transform: translateX(0);
     }
-  }
 
-  /* Screen reader only */
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0,0,0,0);
-    border: 0;
-  }
-</style>
+    #sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
+    #sidebar h2 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    #sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #sidebar li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #334155;
+      cursor: pointer;
+    }
+
+    #sidebar li:hover {
+      background-color: rgba(30, 41, 59, 0.6);
+    }
+
+    #chat-container {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem 2rem;
+      overflow: hidden;
+      position: relative;
+      z-index: 2;
+      margin-left: 220px;
+      transition: margin-left 0.3s ease;
+    }
+
+    #chat-container.full {
+      margin-left: 0;
+    }
+
+    #chat-messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      scroll-behavior: smooth;
+    }
+
+    .message {
+      position: relative;
+      max-width: 640px;
+      padding: 1rem 1.25rem;
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .message.ai {
+      align-self: flex-start;
+      background-color: #1e293b;
+      color: #dbeafe;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background-color: #2563eb;
+      color: #ffffff;
+    }
+
+    .message:hover .actions {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .actions {
+      position: absolute;
+      top: 0.3rem;
+      right: 0.5rem;
+      display: flex;
+      gap: 0.4rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .actions button {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.2rem;
+      transition: color 0.2s;
+    }
+
+    .actions button:hover {
+      color: #e2e8f0;
+    }
+
+    #input-area {
+      display: flex;
+      gap: 0.75rem;
+      padding: 1rem 2rem;
+      border-top: 1px solid #1e293b;
+      background-color: #0f172a;
+    }
+
+    #input-area input[type="text"] {
+      flex-grow: 1;
+      padding: 0.9rem 1.25rem;
+      font-size: 1rem;
+      border: 1px solid #334155;
+      border-radius: 9999px;
+      background-color: #1e293b;
+      color: #e2e8f0;
+      outline: none;
+    }
+
+    #input-area input::placeholder {
+      color: #94a3b8;
+    }
+
+    #input-area button {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border: 1px solid #475569;
+      border-radius: 9999px;
+      background-color: transparent;
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    #input-area button:hover {
+      background-color: #60a5fa;
+    }
+
+    #input-area.disabled input,
+    #input-area.disabled button {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    @media (max-width: 600px) {
+      header, #chat-container, #input-area {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      header {
+        font-size: 1.2rem;
+      }
+
+      #chat-container {
+        margin-left: 0;
+      }
+
+      #sidebar {
+        width: 180px;
+      }
+    }
+  </style>
 </head>
 <body>
-<canvas id="starfield"></canvas>
+  <canvas id="starsCanvas"></canvas>
 
-<div id="app-container" aria-label="NeuraBot login and registration panel">
-  <div id="flip-card" class="flip-card" aria-live="polite">
-    <div class="side front" aria-label="Login form">
-      <h1>NeuraBot</h1>
+  <div id="sidebar">
+    <h2>Histórico</h2>
+    <ul id="history-list">
+      <li>Conversa 1</li>
+      <li>Conversa 2</li>
+      <li>Conversa 3</li>
+    </ul>
+  </div>
 
-      <form id="login-form" aria-describedby="login-desc">
-        <div id="login-desc" class="sr-only">Login form, enter email and password</div>
-        <input type="email" id="login-email" placeholder="Email" required autocomplete="email" inputmode="email" />
-        <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password" />
-        <button type="submit" aria-label="Login">Login</button>
-      </form>
+  <header>
+    <button id="toggle-sidebar" aria-label="Menu">☰</button>
+    <span class="icon" aria-hidden="true">🪐</span>
+    NeuraBot
+    <img src="https://via.placeholder.com/36" alt="Foto de perfil" id="profile-pic" />
+  </header>
 
-      <div class="social-buttons" aria-label="Alternative login options">
-        <button class="social-btn google-btn" aria-label="Login with Google" type="button">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 533.5 544.3" aria-hidden="true" focusable="false">
-            <path fill="#4285F4" d="M533.5 278.4c0-17.4-1.6-34.1-4.7-50.4H272v95.5h146.9c-6.3 33.9-25.3 62.7-54.1 82v67h87.4c51.1-47.1 80.3-116.7 80.3-193.1z"/>
-            <path fill="#34A853" d="M272 544.3c73.6 0 135.5-24.4 180.7-66.2l-87.4-67c-24 16.1-55 25.7-93.3 25.7-71.7 0-132.6-48.3-154.4-113.4h-89.3v70.9C56.7 478.3 157.4 544.3 272 544.3z"/>
-            <path fill="#FBBC05" d="M117.6 321.1c-5.3-15.6-8.3-32.2-8.3-49.1s3-33.5 8.3-49.1v-70.8h-89.3c-18.4 36.7-18.4 80.8 0 117.5l89.3 70.9z"/>
-            <path fill="#EA4335" d="M272 213.2c39 0 74.1 13.4 101.7 39.7l76.3-76.3C393.9 129.3 337.4 106 272 106 157.4 106 56.7 172 18.3 278.4l89.3 70.8c21.8-65.1 82.7-113.3 164.4-113.3z"/>
-          </svg>
-          Google
-        </button>
-        <button class="social-btn github-btn" aria-label="Login with GitHub" type="button">
-          <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" fill="white">
-            <path d="M12 0a12 12 0 00-3.79 23.4c.6.11.82-.26.82-.58v-2.17c-3.34.73-4.04-1.6-4.04-1.6-.54-1.37-1.32-1.74-1.32-1.74-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.23 1.83 1.23 1.06 1.81 2.78 1.29 3.46.99.11-.77.41-1.29.75-1.59-2.67-.31-5.47-1.34-5.47-5.96 0-1.32.47-2.4 1.23-3.24-.12-.31-.54-1.56.12-3.25 0 0 1-.32 3.3 1.22a11.5 11.5 0 016 0c2.3-1.54 3.3-1.22 3.3-1.22.66 1.69.24 2.94.12 3.25.76.84 1.23 1.92 1.23 3.24 0 4.62-2.8 5.65-5.48 5.95.42.36.79 1.09.79 2.2v3.26c0 .32.22.7.82.58A12 12 0 0012 0z"/>
-          </svg>
-          GitHub
-        </button>
-      </div>
+  <div id="chat-container">
+    <section id="chat-messages" aria-live="polite" tabindex="0"></section>
+    <form id="input-area" aria-label="Enviar mensagem">
+      <input type="text" id="user-input" placeholder="Digite sua mensagem..." required />
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
 
-      <button id="toggle-link" class="toggle-btn" aria-label="Switch to signup form" type="button">Don't have an account? Sign up</button>
-    </div>
+  <script>
+    const canvas = document.getElementById('starsCanvas');
+    const ctx = canvas.getContext('2d');
+    const numStars = 300;
+    const stars = [];
 
-    <div class="side back" aria-label="Registration form">
-      <h1>NeuraBot</h1>
-    
-      <form id="signup-form" aria-describedby="signup-desc">
-        <div id="signup-desc" class="sr-only">Signup form, enter name, email and password</div>
-        <input type="text" id="signup-name" placeholder="Full Name" required autocomplete="name" />
-        <input type="email" id="signup-email" placeholder="Email" required autocomplete="email" inputmode="email" />
-        <input type="password" id="signup-password" placeholder="Password" required autocomplete="new-password" />
-        <input type="password" id="signup-password-confirm" placeholder="Confirm Password" required autocomplete="new-password" />
-        <button type="submit" aria-label="Sign up">Sign Up</button>
-      </form>
-    
-      <!-- Social login buttons moved here -->
-      <div class="social-buttons" aria-label="Alternative signup options">
-        <button class="social-btn google-btn" aria-label="Signup with Google" type="button">
-          <!-- SVG do Google -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 533.5 544.3" aria-hidden="true" focusable="false">
-            <path fill="#4285F4" d="M533.5 278.4c0-17.4-1.6-34.1-4.7-50.4H272v95.5h146.9c-6.3 33.9-25.3 62.7-54.1 82v67h87.4c51.1-47.1 80.3-116.7 80.3-193.1z"/>
-            <path fill="#34A853" d="M272 544.3c73.6 0 135.5-24.4 180.7-66.2l-87.4-67c-24 16.1-55 25.7-93.3 25.7-71.7 0-132.6-48.3-154.4-113.4h-89.3v70.9C56.7 478.3 157.4 544.3 272 544.3z"/>
-            <path fill="#FBBC05" d="M117.6 321.1c-5.3-15.6-8.3-32.2-8.3-49.1s3-33.5 8.3-49.1v-70.8h-89.3c-18.4 36.7-18.4 80.8 0 117.5l89.3 70.9z"/>
-            <path fill="#EA4335" d="M272 213.2c39 0 74.1 13.4 101.7 39.7l76.3-76.3C393.9 129.3 337.4 106 272 106 157.4 106 56.7 172 18.3 278.4l89.3 70.8c21.8-65.1 82.7-113.3 164.4-113.3z"/>
-          </svg>
-          Google
-        </button>
-        <button class="social-btn github-btn" aria-label="Signup with GitHub" type="button">
-          <!-- SVG do GitHub -->
-          <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" fill="white">
-            <path d="M12 0a12 12 0 00-3.79 23.4c.6.11.82-.26.82-.58v-2.17c-3.34.73-4.04-1.6-4.04-1.6-.54-1.37-1.32-1.74-1.32-1.74-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.23 1.83 1.23 1.06 1.81 2.78 1.29 3.46.99.11-.77.41-1.29.75-1.59-2.67-.31-5.47-1.34-5.47-5.96 0-1.32.47-2.4 1.23-3.24-.12-.31-.54-1.56.12-3.25 0 0 1-.32 3.3 1.22a11.5 11.5 0 016 0c2.3-1.54 3.3-1.22 3.3-1.22.66 1.69.24 2.94.12 3.25.76.84 1.23 1.92 1.23 3.24 0 4.62-2.8 5.65-5.48 5.95.42.36.79 1.09.79 2.2v3.26c0 .32.22.7.82.58A12 12 0 0012 0z"/>
-          </svg>
-          GitHub
-        </button>
-      </div>
-    
-      <button id="toggle-link-back" class="toggle-btn" aria-label="Switch to login form" type="button">
-        Already have an account? Log in
-      </button>
-    </div>
-    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-<script>
-  // Flip card toggle
-  const flipCard = document.getElementById('flip-card');
-  const toggleLink = document.getElementById('toggle-link');
-  const toggleLinkBack = document.getElementById('toggle-link-back');
-
-  function toggleFlip() {
-    flipCard.classList.toggle('flipped');
-  }
-  toggleLink.addEventListener('click', toggleFlip);
-  toggleLinkBack.addEventListener('click', toggleFlip);
-
-  // Starfield background canvas (improved smooth parallax using lerp and original star positions)
-  const canvas = document.getElementById('starfield');
-  const ctx = canvas.getContext('2d');
-  let stars = [];
-  let width, height;
-  const maxStars = 150;
-
-  function Star(x, y, radius, speed, opacity) {
-    this.x = x; // original x
-    this.y = y; // original y
-    this.radius = radius;
-    this.speed = speed;
-    this.opacity = opacity;
-    this.baseOpacity = opacity;
-    this.angle = Math.random() * 2 * Math.PI;
-    this.angularSpeed = (Math.random() * 0.02) + 0.005;
-    this.offsetX = 0;
-    this.offsetY = 0;
-  }
-  Star.prototype.draw = function(ctx, offsetX, offsetY) {
-    const drawX = this.x + offsetX;
-    const drawY = this.y + offsetY;
-
-    ctx.beginPath();
-    const glowRadius = this.radius * 2.5;
-    const gradient = ctx.createRadialGradient(drawX, drawY, this.radius, drawX, drawY, glowRadius);
-    gradient.addColorStop(0, `rgba(255,255,255,${this.opacity})`);
-    gradient.addColorStop(0.8, `rgba(150,180,255,${this.opacity*0.3})`);
-    gradient.addColorStop(1, 'rgba(150,180,255,0)');
-    ctx.fillStyle = gradient;
-    ctx.arc(drawX, drawY, glowRadius, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.fillStyle = `rgba(255,255,255,${this.opacity})`;
-    ctx.shadowColor = `rgba(150,180,255,${this.opacity})`;
-    ctx.shadowBlur = 8;
-    ctx.arc(drawX, drawY, this.radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-  };
-  Star.prototype.update = function() {
-    this.angle += this.angularSpeed;
-    this.opacity = this.baseOpacity * (0.7 + 0.3 * Math.sin(this.angle * 3));
-  };
-
-
-  function createStars() {
-    stars = [];
-    for (let i = 0; i < maxStars; i++) {
-      let x = Math.random() * width;
-      let y = Math.random() * height;
-      let radius = Math.random() * 1.1 + 0.4;
-      let speed = (Math.random() * 0.05) + 0.01;
-      let opacity = 0.4 + Math.random() * 0.6;
-      stars.push(new Star(x, y, radius, speed, opacity));
-    }
-  }
-
-  function resize() {
-    width = window.innerWidth;
-    height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
-    createStars();
-  }
-
-  window.addEventListener('resize', resize);
-
-  // Linear interpolation helper
-  function lerp(start, end, amt) {
-    return (1 - amt) * start + amt * end;
-  }
-
-  // Track the mouse position with smoothing
-  let mouseX = window.innerWidth / 2;
-  let mouseY = window.innerHeight / 2;
-  let smoothedX = mouseX;
-  let smoothedY = mouseY;
-  window.addEventListener('mousemove', e => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  });
-
-  // Animate stars with parallax effect and twinkle
-  function animate() {
-    ctx.clearRect(0, 0, width, height);
-
-    // Smoothly update smoothed mouse positions towards actual mouse
-    smoothedX = lerp(smoothedX, mouseX, 0.05);
-    smoothedY = lerp(smoothedY, mouseY, 0.05);
-
-    // Calculate center offsets from screen center, maximum parallax amplitude 15px
-    let offsetX = (smoothedX - width / 2) * 0.03;
-    let offsetY = (smoothedY - height / 2) * 0.03;
-
-    for (let star of stars) {
-      star.update();
-      // Draw stars offset by parallax amount, no permanent movement on star coords
-      star.draw(ctx, offsetX * star.radius * 0.9, offsetY * star.radius * 0.9);
+    function generateStars() {
+      for (let i = 0; i < numStars; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.5,
+          speed: Math.random() * 0.5 + 0.2,
+          opacity: Math.random() * 0.5 + 0.5,
+        });
+      }
     }
 
-    requestAnimationFrame(animate);
-  }
-
-  resize();
-  animate();
-
-  // Form submit handlers (for demo only)
-  document.getElementById('login-form').addEventListener('submit', e => {
-    e.preventDefault();
-    alert('Logged in with email: ' + e.target['login-email'].value);
-  });
-  document.getElementById('signup-form').addEventListener('submit', e => {
-    e.preventDefault();
-    let pass = e.target['signup-password'].value;
-    let passConfirm = e.target['signup-password-confirm'].value;
-    if (pass !== passConfirm) {
-      alert('Passwords do not match!');
-      return;
+    function updateStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let star of stars) {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+        ctx.fill();
+        star.y += star.speed;
+        if (star.y > canvas.height) star.y = 0;
+      }
+      requestAnimationFrame(updateStars);
     }
-    alert('Registered user: ' + e.target['signup-name'].value);
-  });
 
-  // Social Login buttons placeholders
-  document.querySelector('.google-btn').addEventListener('click', () => {
-    alert('Google login clicked!');
-  });
-  document.querySelector('.github-btn').addEventListener('click', () => {
-    alert('GitHub login clicked!');
-  });
-</script>
+    generateStars();
+    updateStars();
 
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggle-sidebar');
+    const chatContainer = document.getElementById('chat-container');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('hidden');
+      chatContainer.classList.toggle('full');
+    });
+
+    (function(){
+      const chatMessages = document.getElementById('chat-messages');
+      const inputForm = document.getElementById('input-area');
+      const userInput = document.getElementById('user-input');
+      let isProcessing = false;
+      let currentSpeech = null;
+
+      function createMessageElement(text, sender) {
+        const msg = document.createElement('div');
+        msg.className = `message ${sender}`;
+        const textNode = document.createTextNode(text);
+        msg.appendChild(textNode);
+
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+
+        const speakBtn = document.createElement('button');
+        speakBtn.innerHTML = '🔊';
+        speakBtn.title = 'Ouvir';
+        speakBtn.onclick = () => {
+          if (currentSpeech) speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = 'pt-BR';
+          currentSpeech = utterance;
+          speechSynthesis.speak(utterance);
+        };
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.innerHTML = '❌';
+        cancelBtn.title = 'Cancelar fala';
+        cancelBtn.onclick = () => {
+          if (currentSpeech) {
+            speechSynthesis.cancel();
+            currentSpeech = null;
+          }
+        };
+
+        const copyBtn = document.createElement('button');
+        copyBtn.innerHTML = '📋';
+        copyBtn.title = 'Copiar';
+        copyBtn.onclick = () => {
+          navigator.clipboard.writeText(text).then(() => {
+            copyBtn.innerText = '✅';
+            setTimeout(() => copyBtn.innerText = '📋', 1000);
+          });
+        };
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '🗑️';
+        deleteBtn.title = 'Excluir';
+        deleteBtn.onclick = () => msg.remove();
+
+        actions.append(speakBtn, cancelBtn, copyBtn, deleteBtn);
+        msg.appendChild(actions);
+        return msg;
+      }
+
+      function appendMessage(text, sender) {
+        const msg = createMessageElement(text, sender);
+        chatMessages.appendChild(msg);
+        chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
+      }
+
+      function simulateTypingEffect(text, sender = 'ai') {
+        const msg = createMessageElement('', sender);
+        const textNode = msg.childNodes[0];
+        chatMessages.appendChild(msg);
+        chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
+
+        let i = 0;
+        function type() {
+          if (i < text.length) {
+            textNode.textContent += text.charAt(i++);
+            setTimeout(type, 20);
+          } else {
+            isProcessing = false;
+            setInputDisabled(false);
+          }
+        }
+        type();
+      }
+
+      function setInputDisabled(disabled) {
+        inputForm.classList.toggle('disabled', disabled);
+        userInput.disabled = disabled;
+        inputForm.querySelector('button').disabled = disabled;
+      }
+
+      function simulateAIResponse(userText) {
+        const responses = [
+          "O cosmos é vasto e cheio de maravilhas ainda por descobrir.",
+          "Você sabia que a luz das estrelas pode levar milhares de anos para chegar até nós?",
+          "Vamos juntos navegar pela imensidão do espaço sideral!",
+          "Quer saber mais sobre planetas, buracos negros ou nebulosas?"
+        ];
+        const answer = userText.trim().length > 2
+          ? responses[Math.floor(Math.random() * responses.length)]
+          : "Desculpe, não entendi. Pode reformular?";
+        isProcessing = true;
+        setInputDisabled(true);
+        setTimeout(() => simulateTypingEffect(answer), 600 + Math.random() * 400);
+      }
+
+      inputForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (isProcessing) return;
+        const text = userInput.value.trim();
+        if (!text) return;
+        appendMessage(text, 'user');
+        userInput.value = '';
+        simulateAIResponse(text);
+      });
+
+      window.addEventListener('load', () => {
+        appendMessage("Olá! Sou a Neura, sua assistente IA. Vamos conversar sobre o universo?", 'ai');
+        setInputDisabled(false);
+        userInput.focus();
+      });
+    })();
+  </script>
 </body>
 </html>
-</content>
-</create_file>
