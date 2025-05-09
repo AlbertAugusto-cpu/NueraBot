@@ -35,10 +35,71 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      position: relative;
+      z-index: 4;
     }
 
     header .icon {
       font-size: 1.8rem;
+    }
+
+    #profile-pic {
+      margin-left: auto;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #334155;
+    }
+
+    #toggle-sidebar {
+      background: none;
+      border: none;
+      color: #cbd5e1;
+      font-size: 1.5rem;
+      cursor: pointer;
+      margin-right: 0.75rem;
+    }
+
+    #sidebar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100%;
+      background-color: rgba(15, 23, 42, 0.6);
+      color: #cbd5e1;
+      padding: 1rem;
+      border-right: 1px solid #1e293b;
+      z-index: 3;
+      backdrop-filter: blur(6px);
+      transition: transform 0.3s ease;
+      transform: translateX(0);
+    }
+
+    #sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
+    #sidebar h2 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    #sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #sidebar li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #334155;
+      cursor: pointer;
+    }
+
+    #sidebar li:hover {
+      background-color: rgba(30, 41, 59, 0.6);
     }
 
     #chat-container {
@@ -49,6 +110,12 @@
       overflow: hidden;
       position: relative;
       z-index: 2;
+      margin-left: 220px;
+      transition: margin-left 0.3s ease;
+    }
+
+    #chat-container.full {
+      margin-left: 0;
     }
 
     #chat-messages {
@@ -90,8 +157,9 @@
 
     .actions {
       position: absolute;
-      top: 0.3rem;
-      right: 0.5rem;
+      bottom: -1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
       gap: 0.4rem;
       opacity: 0;
@@ -176,16 +244,36 @@
       header {
         font-size: 1.2rem;
       }
+
+      #chat-container {
+        margin-left: 0;
+      }
+
+      #sidebar {
+        width: 180px;
+      }
     }
   </style>
 </head>
 <body>
   <canvas id="starsCanvas"></canvas>
 
+  <div id="sidebar">
+    <h2>Histórico</h2>
+    <ul id="history-list">
+      <li>Conversa 1</li>
+      <li>Conversa 2</li>
+      <li>Conversa 3</li>
+    </ul>
+  </div>
+
   <header>
+    <button id="toggle-sidebar" aria-label="Menu">☰</button>
     <span class="icon" aria-hidden="true">🪐</span>
     NeuraBot
+    <img src="https://via.placeholder.com/36" alt="Foto de perfil" id="profile-pic" />
   </header>
+
   <div id="chat-container">
     <section id="chat-messages" aria-live="polite" tabindex="0"></section>
     <form id="input-area" aria-label="Enviar mensagem">
@@ -217,23 +305,28 @@
 
     function updateStars() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      for (let i = 0; i < stars.length; i++) {
-        const star = stars[i];
+      for (let star of stars) {
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
         ctx.fill();
         star.y += star.speed;
-        if (star.y > canvas.height) {
-          star.y = 0;
-        }
+        if (star.y > canvas.height) star.y = 0;
       }
       requestAnimationFrame(updateStars);
     }
 
     generateStars();
     updateStars();
+
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggle-sidebar');
+    const chatContainer = document.getElementById('chat-container');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('hidden');
+      chatContainer.classList.toggle('full');
+    });
 
     (function(){
       const chatMessages = document.getElementById('chat-messages');
@@ -255,9 +348,7 @@
         speakBtn.innerHTML = '🔊';
         speakBtn.title = 'Ouvir';
         speakBtn.onclick = () => {
-          if (currentSpeech) {
-            speechSynthesis.cancel();  // Cancela qualquer fala anterior
-          }
+          if (currentSpeech) speechSynthesis.cancel();
           const utterance = new SpeechSynthesisUtterance(text);
           utterance.lang = 'pt-BR';
           currentSpeech = utterance;
@@ -287,9 +378,7 @@
         const deleteBtn = document.createElement('button');
         deleteBtn.innerHTML = '🗑️';
         deleteBtn.title = 'Excluir';
-        deleteBtn.onclick = () => {
-          msg.remove();
-        };
+        deleteBtn.onclick = () => msg.remove();
 
         actions.append(speakBtn, cancelBtn, copyBtn, deleteBtn);
         msg.appendChild(actions);
